@@ -10,25 +10,44 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Send, User, Phone, Mail, MapPin, DollarSign, Calendar, CheckCircle } from 'lucide-react';
-import type { FormField } from '@/types';
+import type { FormField, QuoteRequest } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+
+type DynamicFieldValue = QuoteRequest['fields'][string];
 
 interface QuoteFormProps {
   catId: string;
   formFields: FormField[];
 }
 
+function fieldIsVisible(field: FormField, data: Record<string, unknown>, translate: (key: string) => string): boolean {
+  const cond = field.visibleWhen;
+  if (!cond) return true;
+  const dep = data[cond.field];
+  if (dep === undefined || dep === null || dep === '') return false;
+  return cond.anyOfOptionKeys.some((key) => translate(key) === dep);
+}
+
 export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
   const { t } = useLanguage();
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Partial<Record<string, DynamicFieldValue>>>({});
   const [contactInfo, setContactInfo] = useState({
     name: '', phone: '', email: '', location: '',
     preferredDate: '', budget: '', notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleFieldChange = (name: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleFieldChange = (name: string, value: DynamicFieldValue) => {
+    setFormData((prev) => {
+      const next: Partial<Record<string, DynamicFieldValue>> = { ...prev, [name]: value };
+      if (name === 'serviceType' && value === t('opt_new_install')) {
+        delete next.damageLevel;
+      }
+      if (name === 'fenceType' && value !== t('opt_wooden')) {
+        delete next.woodType;
+      }
+      return next;
+    });
   };
 
   const handleContactChange = (field: string, value: string) => {
@@ -173,7 +192,9 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
           <p className="text-sm text-gray-500 mt-1">{t('quote_service_desc')}</p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {formFields.map((field) => (
+          {formFields
+            .filter((field) => fieldIsVisible(field, formData, t))
+            .map((field) => (
             <div key={field.name}>
               <Label className="text-sm font-semibold text-gray-800 mb-2 block">
                 {field.label}

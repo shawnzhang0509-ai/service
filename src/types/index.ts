@@ -24,6 +24,8 @@ export interface FormField {
   min?: number;
   max?: number;
   step?: number;
+  /** Show this field only when the named field's value equals one of these option labels (via translation keys). */
+  visibleWhen?: { field: string; anyOfOptionKeys: string[] };
 }
 
 export interface QuoteGuidance {
