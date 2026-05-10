@@ -12,14 +12,15 @@ const rawFormFields: Record<string, Array<{
   min?: number;
   max?: number;
   step?: number;
+  visibleWhen?: FormField['visibleWhen'];
 }>> = {
   fence: [
-    { name: 'fenceType', labelKey: 'fl_fence_type', type: 'select', optionKeys: ['opt_wooden','opt_metal','opt_pvc','opt_concrete','opt_other'], required: true, helperKey: 'hlp_fence_length' },
+    { name: 'fenceType', labelKey: 'fl_fence_type', type: 'select', optionKeys: ['opt_wooden','opt_metal','opt_pvc','opt_concrete','opt_other'], required: true },
     { name: 'serviceType', labelKey: 'fl_service_type', type: 'select', optionKeys: ['opt_new_install','opt_partial','opt_full','opt_heighten','opt_other'], required: true },
     { name: 'totalLength', labelKey: 'fl_total_length', type: 'number', placeholderKey: 'ph_fence_length', required: true, helperKey: 'hlp_fence_length' },
     { name: 'fenceHeight', labelKey: 'fl_fence_height', type: 'select', optionKeys: ['opt_0_9','opt_1_2','opt_1_5','opt_1_8','opt_2_0'], required: true },
-    { name: 'woodType', labelKey: 'fl_wood_pref', type: 'select', optionKeys: ['opt_pine','opt_treated','opt_hardwood','opt_redwood','opt_no_pref'], required: false },
-    { name: 'damageLevel', labelKey: 'fl_damage', type: 'select', optionKeys: ['opt_minor','opt_moderate','opt_severe','opt_none'], required: true },
+    { name: 'woodType', labelKey: 'fl_wood_pref', type: 'select', optionKeys: ['opt_pine','opt_treated','opt_hardwood','opt_redwood','opt_no_pref'], required: false, visibleWhen: { field: 'fenceType', anyOfOptionKeys: ['opt_wooden'] } },
+    { name: 'damageLevel', labelKey: 'fl_damage', type: 'select', optionKeys: ['opt_minor','opt_moderate','opt_severe','opt_none'], required: true, visibleWhen: { field: 'serviceType', anyOfOptionKeys: ['opt_partial','opt_full','opt_heighten','opt_other'] } },
     { name: 'includeGate', labelKey: 'fl_need_gate', type: 'checkbox', optionKeys: ['opt_single','opt_double','opt_sliding','opt_no_gate'], required: false },
     { name: 'postType', labelKey: 'fl_post', type: 'radio', optionKeys: ['opt_wood_post','opt_metal_post','opt_concrete_post'], required: false },
   ],
@@ -128,6 +129,7 @@ export function getTranslatedFields(catId: string, t: (key: string) => string): 
     min: f.min,
     max: f.max,
     step: f.step,
+    visibleWhen: f.visibleWhen,
   }));
 }
 
