@@ -66,42 +66,42 @@ const rawFormFields: Record<string, Array<{
   ],
 };
 
-// Guide keys for each category
-const guideKeys: Record<string, Array<{ titleKey: string; descKey: string; priceRange: string }>> = {
+// Guide keys for each category (price ranges use i18n so English UI never shows Chinese units)
+const guideKeys: Record<string, Array<{ titleKey: string; descKey: string; priceRangeKey: string }>> = {
   fence: [
-    { titleKey: 'guide_fence_pine_title', descKey: 'guide_fence_pine_desc', priceRange: '$80 - $120 /米' },
-    { titleKey: 'guide_fence_treated_title', descKey: 'guide_fence_treated_desc', priceRange: '$100 - $150 /米' },
-    { titleKey: 'guide_fence_hard_title', descKey: 'guide_fence_hard_desc', priceRange: '$150 - $250 /米' },
-    { titleKey: 'guide_fence_metal_title', descKey: 'guide_fence_metal_desc', priceRange: '$120 - $200 /米' },
-    { titleKey: 'guide_fence_repair_title', descKey: 'guide_fence_repair_desc', priceRange: '$200 - $800 起' },
+    { titleKey: 'guide_fence_pine_title', descKey: 'guide_fence_pine_desc', priceRangeKey: 'guide_fence_pine_price' },
+    { titleKey: 'guide_fence_treated_title', descKey: 'guide_fence_treated_desc', priceRangeKey: 'guide_fence_treated_price' },
+    { titleKey: 'guide_fence_hard_title', descKey: 'guide_fence_hard_desc', priceRangeKey: 'guide_fence_hard_price' },
+    { titleKey: 'guide_fence_metal_title', descKey: 'guide_fence_metal_desc', priceRangeKey: 'guide_fence_metal_price' },
+    { titleKey: 'guide_fence_repair_title', descKey: 'guide_fence_repair_desc', priceRangeKey: 'guide_fence_repair_price' },
   ],
   painting: [
-    { titleKey: 'guide_paint_int_title', descKey: 'guide_paint_int_desc', priceRange: '$25 - $45 /平方米' },
-    { titleKey: 'guide_paint_ext_title', descKey: 'guide_paint_ext_desc', priceRange: '$35 - $55 /平方米' },
-    { titleKey: 'guide_paint_roof_title', descKey: 'guide_paint_roof_desc', priceRange: '$45 - $70 /平方米' },
-    { titleKey: 'guide_paint_new_title', descKey: 'guide_paint_new_desc', priceRange: '$20 - $35 /平方米' },
-    { titleKey: 'guide_paint_re_title', descKey: 'guide_paint_re_desc', priceRange: '$40 - $60 /平方米' },
+    { titleKey: 'guide_paint_int_title', descKey: 'guide_paint_int_desc', priceRangeKey: 'guide_paint_int_price' },
+    { titleKey: 'guide_paint_ext_title', descKey: 'guide_paint_ext_desc', priceRangeKey: 'guide_paint_ext_price' },
+    { titleKey: 'guide_paint_roof_title', descKey: 'guide_paint_roof_desc', priceRangeKey: 'guide_paint_roof_price' },
+    { titleKey: 'guide_paint_new_title', descKey: 'guide_paint_new_desc', priceRangeKey: 'guide_paint_new_price' },
+    { titleKey: 'guide_paint_re_title', descKey: 'guide_paint_re_desc', priceRangeKey: 'guide_paint_re_price' },
   ],
   cleaning: [
-    { titleKey: 'guide_clean_reg_title', descKey: 'guide_clean_reg_desc', priceRange: '$30 - $50 /小时' },
-    { titleKey: 'guide_clean_deep_title', descKey: 'guide_clean_deep_desc', priceRange: '$45 - $65 /小时' },
-    { titleKey: 'guide_clean_move_title', descKey: 'guide_clean_move_desc', priceRange: '$350 - $800' },
-    { titleKey: 'guide_clean_reno_title', descKey: 'guide_clean_reno_desc', priceRange: '$400 - $1000' },
-    { titleKey: 'guide_clean_carpet_title', descKey: 'guide_clean_carpet_desc', priceRange: '$80 - $150 /房间' },
+    { titleKey: 'guide_clean_reg_title', descKey: 'guide_clean_reg_desc', priceRangeKey: 'guide_clean_reg_price' },
+    { titleKey: 'guide_clean_deep_title', descKey: 'guide_clean_deep_desc', priceRangeKey: 'guide_clean_deep_price' },
+    { titleKey: 'guide_clean_move_title', descKey: 'guide_clean_move_desc', priceRangeKey: 'guide_clean_move_price' },
+    { titleKey: 'guide_clean_reno_title', descKey: 'guide_clean_reno_desc', priceRangeKey: 'guide_clean_reno_price' },
+    { titleKey: 'guide_clean_carpet_title', descKey: 'guide_clean_carpet_desc', priceRangeKey: 'guide_clean_carpet_price' },
   ],
   plumbing: [
-    { titleKey: 'guide_plumb_em_title', descKey: 'guide_plumb_em_desc', priceRange: '$120 - $250 /小时' },
-    { titleKey: 'guide_plumb_reg_title', descKey: 'guide_plumb_reg_desc', priceRange: '$80 - $140 /小时' },
-    { titleKey: 'guide_plumb_inst_title', descKey: 'guide_plumb_inst_desc', priceRange: '$150 - $500 /件' },
-    { titleKey: 'guide_plumb_hot_title', descKey: 'guide_plumb_hot_desc', priceRange: '$300 - $2000+' },
-    { titleKey: 'guide_plumb_pipe_title', descKey: 'guide_plumb_pipe_desc', priceRange: '$500 - $3000+' },
+    { titleKey: 'guide_plumb_em_title', descKey: 'guide_plumb_em_desc', priceRangeKey: 'guide_plumb_em_price' },
+    { titleKey: 'guide_plumb_reg_title', descKey: 'guide_plumb_reg_desc', priceRangeKey: 'guide_plumb_reg_price' },
+    { titleKey: 'guide_plumb_inst_title', descKey: 'guide_plumb_inst_desc', priceRangeKey: 'guide_plumb_inst_price' },
+    { titleKey: 'guide_plumb_hot_title', descKey: 'guide_plumb_hot_desc', priceRangeKey: 'guide_plumb_hot_price' },
+    { titleKey: 'guide_plumb_pipe_title', descKey: 'guide_plumb_pipe_desc', priceRangeKey: 'guide_plumb_pipe_price' },
   ],
   electrical: [
-    { titleKey: 'guide_elec_em_title', descKey: 'guide_elec_em_desc', priceRange: '$150 - $280 /小时' },
-    { titleKey: 'guide_elec_reg_title', descKey: 'guide_elec_reg_desc', priceRange: '$90 - $150 /小时' },
-    { titleKey: 'guide_elec_light_title', descKey: 'guide_elec_light_desc', priceRange: '$60 - $150 /盏' },
-    { titleKey: 'guide_elec_socket_title', descKey: 'guide_elec_socket_desc', priceRange: '$80 - $200 /个' },
-    { titleKey: 'guide_elec_circuit_title', descKey: 'guide_elec_circuit_desc', priceRange: '$2000 - $8000+' },
+    { titleKey: 'guide_elec_em_title', descKey: 'guide_elec_em_desc', priceRangeKey: 'guide_elec_em_price' },
+    { titleKey: 'guide_elec_reg_title', descKey: 'guide_elec_reg_desc', priceRangeKey: 'guide_elec_reg_price' },
+    { titleKey: 'guide_elec_light_title', descKey: 'guide_elec_light_desc', priceRangeKey: 'guide_elec_light_price' },
+    { titleKey: 'guide_elec_socket_title', descKey: 'guide_elec_socket_desc', priceRangeKey: 'guide_elec_socket_price' },
+    { titleKey: 'guide_elec_circuit_title', descKey: 'guide_elec_circuit_desc', priceRangeKey: 'guide_elec_circuit_price' },
   ],
 };
 
@@ -137,7 +137,7 @@ export function getTranslatedGuides(catId: string, t: (key: string) => string) {
   return (guideKeys[catId] || []).map((g) => ({
     title: t(g.titleKey),
     description: t(g.descKey),
-    priceRange: g.priceRange,
+    priceRange: t(g.priceRangeKey),
   }));
 }
 

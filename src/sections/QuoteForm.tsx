@@ -10,10 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Send, User, Phone, Mail, MapPin, DollarSign, Calendar, CheckCircle } from 'lucide-react';
-import type { FormField, QuoteRequest } from '@/types';
+import type { FormField } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 
-type DynamicFieldValue = QuoteRequest['fields'][string];
+/** Values stored by service detail controls (matches rendered input types). */
+type ServiceDetailValue = string | number | string[];
 
 interface QuoteFormProps {
   catId: string;
@@ -30,16 +31,16 @@ function fieldIsVisible(field: FormField, data: Record<string, unknown>, transla
 
 export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
   const { t } = useLanguage();
-  const [formData, setFormData] = useState<Partial<Record<string, DynamicFieldValue>>>({});
+  const [formData, setFormData] = useState<Partial<Record<string, ServiceDetailValue>>>({});
   const [contactInfo, setContactInfo] = useState({
     name: '', phone: '', email: '', location: '',
     preferredDate: '', budget: '', notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleFieldChange = (name: string, value: DynamicFieldValue) => {
+  const handleFieldChange = (name: string, value: ServiceDetailValue) => {
     setFormData((prev) => {
-      const next: Partial<Record<string, DynamicFieldValue>> = { ...prev, [name]: value };
+      const next: Partial<Record<string, ServiceDetailValue>> = { ...prev, [name]: value };
       if (name === 'serviceType' && value === t('opt_new_install')) {
         delete next.damageLevel;
       }
@@ -79,15 +80,17 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             className="w-full" min={field.min} max={field.max} />
         );
-      case 'select':
+      case 'select': {
+        const selectVal = typeof value === 'string' ? value : '';
         return (
-          <Select value={value || ''} onValueChange={(v) => handleFieldChange(field.name, v)}>
+          <Select value={selectVal} onValueChange={(v) => handleFieldChange(field.name, v)}>
             <SelectTrigger className="w-full"><SelectValue placeholder={t('opt_select')} /></SelectTrigger>
             <SelectContent>
               {field.options?.map((opt) => (<SelectItem key={opt} value={opt}>{opt}</SelectItem>))}
             </SelectContent>
           </Select>
         );
+      }
       case 'textarea':
         return (
           <Textarea placeholder={field.placeholder} value={value || ''}
@@ -97,12 +100,13 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
         return (
           <div className="space-y-2">
             {field.options?.map((opt) => {
-              const checked = (value || []).includes(opt);
+              const list = Array.isArray(value) ? value : [];
+              const checked = list.includes(opt);
               return (
                 <div key={opt} className="flex items-center space-x-2">
                   <Checkbox id={`${field.name}-${opt}`} checked={checked}
                     onCheckedChange={(checked) => {
-                      const current = value || [];
+                      const current = Array.isArray(value) ? value : [];
                       if (checked) handleFieldChange(field.name, [...current, opt]);
                       else handleFieldChange(field.name, current.filter((v: string) => v !== opt));
                     }} />
@@ -112,9 +116,10 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
             })}
           </div>
         );
-      case 'radio':
+      case 'radio': {
+        const radioVal = typeof value === 'string' ? value : '';
         return (
-          <RadioGroup value={value || ''} onValueChange={(v) => handleFieldChange(field.name, v)} className="space-y-2">
+          <RadioGroup value={radioVal} onValueChange={(v) => handleFieldChange(field.name, v)} className="space-y-2">
             {field.options?.map((opt) => (
               <div key={opt} className="flex items-center space-x-2">
                 <RadioGroupItem value={opt} id={`${field.name}-${opt}`} />
@@ -123,6 +128,7 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
             ))}
           </RadioGroup>
         );
+      }
       case 'date':
         return (
           <Input type="date" value={value || ''}
