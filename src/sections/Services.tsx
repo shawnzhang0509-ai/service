@@ -1,7 +1,8 @@
 import { Link } from 'react-router';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Fence, Paintbrush, Sparkles, Droplets, Zap, ArrowRight } from 'lucide-react';
+import { Fence, Paintbrush, Sparkles, Droplets, Zap, Truck, Sofa, ArrowRight } from 'lucide-react';
+import { baseCategories } from '@/data/services';
 import { useLanguage } from '@/context/LanguageContext';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -10,17 +11,9 @@ const iconMap: Record<string, React.ReactNode> = {
   Sparkles: <Sparkles className="w-8 h-8" />,
   Droplets: <Droplets className="w-8 h-8" />,
   Zap: <Zap className="w-8 h-8" />,
+  Truck: <Truck className="w-8 h-8" />,
+  Sofa: <Sofa className="w-8 h-8" />,
 };
-
-const catKeys: Record<string, { nameKey: string; descKey: string; image: string; icon: string; color: string; bgColor: string; price: string; unitKey: string }> = {
-  fence: { nameKey: 'cat_fence', descKey: 'desc_fence', image: '/fence-service.jpg', icon: 'Fence', color: 'text-amber-700', bgColor: 'bg-amber-50', price: '$80-150', unitKey: 'unit_metre' },
-  painting: { nameKey: 'cat_painting', descKey: 'desc_painting', image: '/painting-service.jpg', icon: 'Paintbrush', color: 'text-blue-700', bgColor: 'bg-blue-50', price: '$25-45', unitKey: 'unit_sqm' },
-  cleaning: { nameKey: 'cat_cleaning', descKey: 'desc_cleaning', image: '/cleaning-service.jpg', icon: 'Sparkles', color: 'text-teal-700', bgColor: 'bg-teal-50', price: '$30-60', unitKey: 'unit_hour' },
-  plumbing: { nameKey: 'cat_plumbing', descKey: 'desc_plumbing', image: '/plumbing-service.jpg', icon: 'Droplets', color: 'text-cyan-700', bgColor: 'bg-cyan-50', price: '$80-140', unitKey: 'unit_hour' },
-  electrical: { nameKey: 'cat_electrical', descKey: 'desc_electrical', image: '/electrical-service.jpg', icon: 'Zap', color: 'text-amber-600', bgColor: 'bg-amber-50', price: '$90-150', unitKey: 'unit_hour' },
-};
-
-const catIds = ['fence', 'painting', 'cleaning', 'plumbing', 'electrical'];
 
 export default function Services() {
   const { t } = useLanguage();
@@ -41,10 +34,8 @@ export default function Services() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {catIds.map((id) => {
-            const cat = catKeys[id];
-            return (
-              <Link key={id} to={`/quote?category=${id}`}>
+          {baseCategories.map((cat) => (
+              <Link key={cat.id} to={`/quote?category=${cat.id}`}>
                 <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-gray-100 cursor-pointer h-full">
                   <div className="relative h-48 overflow-hidden">
                     <img src={cat.image} alt={t(cat.nameKey)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -60,11 +51,11 @@ export default function Services() {
                           {t(cat.nameKey)}
                         </h3>
                         <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                          {t(cat.descKey)}
+                          {t(`desc_${cat.id}`)}
                         </p>
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-gray-700">
-                            {t('services_price_label')}：{cat.price} <span className="text-gray-400 text-xs">{t(cat.unitKey)}</span>
+                            {t('services_price_label')}：{cat.averagePrice} <span className="text-gray-400 text-xs">{t(cat.unitKey)}</span>
                           </span>
                           <span className="flex items-center text-sm text-teal-600 font-medium group-hover:translate-x-1 transition-transform">
                             {t('services_cta')}
@@ -76,8 +67,7 @@ export default function Services() {
                   </CardContent>
                 </Card>
               </Link>
-            );
-          })}
+          ))}
 
           <Card className="border-dashed border-2 border-gray-200 bg-gray-50/50 flex items-center justify-center min-h-[280px]">
             <CardContent className="text-center p-6">

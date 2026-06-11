@@ -4,7 +4,7 @@ import { baseCategories, getTranslatedFields, getTranslatedGuides } from '@/data
 import QuoteForm from '@/sections/QuoteForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Fence, Paintbrush, Sparkles, Droplets, Zap, ArrowLeft } from 'lucide-react';
+import { Fence, Paintbrush, Sparkles, Droplets, Zap, Truck, Sofa, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -14,6 +14,8 @@ const iconMap: Record<string, React.ReactNode> = {
   Sparkles: <Sparkles className="w-6 h-6" />,
   Droplets: <Droplets className="w-6 h-6" />,
   Zap: <Zap className="w-6 h-6" />,
+  Truck: <Truck className="w-6 h-6" />,
+  Sofa: <Sofa className="w-6 h-6" />,
 };
 
 export default function QuotePage() {
