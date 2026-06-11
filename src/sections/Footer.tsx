@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { Wrench, Mail, Phone, MapPin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useLanguage } from '@/context/LanguageContext';
+import { baseCategories } from '@/data/services';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -31,11 +32,13 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">{t('footer_services')}</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/quote?category=fence" className="hover:text-teal-400 transition-colors">{t('cat_fence')}</Link></li>
-              <li><Link to="/quote?category=painting" className="hover:text-teal-400 transition-colors">{t('cat_painting')}</Link></li>
-              <li><Link to="/quote?category=cleaning" className="hover:text-teal-400 transition-colors">{t('cat_cleaning')}</Link></li>
-              <li><Link to="/quote?category=plumbing" className="hover:text-teal-400 transition-colors">{t('cat_plumbing')}</Link></li>
-              <li><Link to="/quote?category=electrical" className="hover:text-teal-400 transition-colors">{t('cat_electrical')}</Link></li>
+              {baseCategories.map((cat) => (
+                <li key={cat.id}>
+                  <Link to={`/quote?category=${cat.id}`} className="hover:text-teal-400 transition-colors">
+                    {t(cat.nameKey)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

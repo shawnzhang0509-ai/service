@@ -64,6 +64,25 @@ const rawFormFields: Record<string, Array<{
     { name: 'needCertification', labelKey: 'fl_cert', type: 'radio', optionKeys: ['opt_need_coc','opt_no'], required: false, helperKey: 'hlp_cert' },
     { name: 'accessTime', labelKey: 'fl_avail', type: 'select', optionKeys: ['opt_weekday','opt_evening','opt_weekend','opt_anytime'], required: true },
   ],
+  moving: [
+    { name: 'moveType', labelKey: 'fl_move_type', type: 'select', optionKeys: ['opt_move_local','opt_move_intercity','opt_move_office','opt_move_few','opt_other'], required: true },
+    { name: 'loadSize', labelKey: 'fl_load_size', type: 'select', optionKeys: ['opt_studio','opt_1br','opt_2br','opt_3br','opt_4br_plus'], required: true },
+    { name: 'fromAddress', labelKey: 'fl_from_address', type: 'text', placeholderKey: 'ph_from_address', required: true },
+    { name: 'toAddress', labelKey: 'fl_to_address', type: 'text', placeholderKey: 'ph_to_address', required: true },
+    { name: 'moveDate', labelKey: 'fl_move_date', type: 'date', required: true },
+    { name: 'needPacking', labelKey: 'fl_need_packing', type: 'radio', optionKeys: ['opt_packing_full','opt_packing_partial','opt_packing_none'], required: true },
+    { name: 'largeItems', labelKey: 'fl_large_items', type: 'checkbox', optionKeys: ['opt_piano','opt_fridge_move','opt_washer','opt_pool_table','opt_no_large'], required: false },
+    { name: 'accessNotes', labelKey: 'fl_move_access', type: 'textarea', placeholderKey: 'ph_move_access', required: false, helperKey: 'hlp_move_access' },
+  ],
+  furniture: [
+    { name: 'furnitureType', labelKey: 'fl_furniture_type', type: 'select', optionKeys: ['opt_furn_ikea','opt_furn_flat','opt_furn_office','opt_furn_outdoor','opt_furn_kitchen','opt_other'], required: true },
+    { name: 'itemCount', labelKey: 'fl_quantity', type: 'number', placeholderKey: 'ph_furniture_items', required: true },
+    { name: 'roomLocation', labelKey: 'fl_furn_room', type: 'select', optionKeys: ['opt_living','opt_bedroom','opt_office_room','opt_outdoor','opt_whole_house'], required: true },
+    { name: 'hasManual', labelKey: 'fl_has_manual', type: 'radio', optionKeys: ['opt_yes','opt_no','opt_unsure'], required: true },
+    { name: 'needRemoval', labelKey: 'fl_need_removal', type: 'radio', optionKeys: ['opt_yes','opt_no'], required: false },
+    { name: 'description', labelKey: 'fl_furn_desc', type: 'textarea', placeholderKey: 'ph_desc_furniture', required: true },
+    { name: 'accessTime', labelKey: 'fl_avail', type: 'select', optionKeys: ['opt_weekday','opt_evening','opt_weekend','opt_anytime'], required: true },
+  ],
 };
 
 // Guide keys for each category (price ranges use i18n so English UI never shows Chinese units)
@@ -103,6 +122,20 @@ const guideKeys: Record<string, Array<{ titleKey: string; descKey: string; price
     { titleKey: 'guide_elec_socket_title', descKey: 'guide_elec_socket_desc', priceRangeKey: 'guide_elec_socket_price' },
     { titleKey: 'guide_elec_circuit_title', descKey: 'guide_elec_circuit_desc', priceRangeKey: 'guide_elec_circuit_price' },
   ],
+  moving: [
+    { titleKey: 'guide_move_small_title', descKey: 'guide_move_small_desc', priceRangeKey: 'guide_move_small_price' },
+    { titleKey: 'guide_move_med_title', descKey: 'guide_move_med_desc', priceRangeKey: 'guide_move_med_price' },
+    { titleKey: 'guide_move_large_title', descKey: 'guide_move_large_desc', priceRangeKey: 'guide_move_large_price' },
+    { titleKey: 'guide_move_few_title', descKey: 'guide_move_few_desc', priceRangeKey: 'guide_move_few_price' },
+    { titleKey: 'guide_move_pack_title', descKey: 'guide_move_pack_desc', priceRangeKey: 'guide_move_pack_price' },
+  ],
+  furniture: [
+    { titleKey: 'guide_furn_flat_title', descKey: 'guide_furn_flat_desc', priceRangeKey: 'guide_furn_flat_price' },
+    { titleKey: 'guide_furn_bed_title', descKey: 'guide_furn_bed_desc', priceRangeKey: 'guide_furn_bed_price' },
+    { titleKey: 'guide_furn_office_title', descKey: 'guide_furn_office_desc', priceRangeKey: 'guide_furn_office_price' },
+    { titleKey: 'guide_furn_outdoor_title', descKey: 'guide_furn_outdoor_desc', priceRangeKey: 'guide_furn_outdoor_price' },
+    { titleKey: 'guide_furn_kitchen_title', descKey: 'guide_furn_kitchen_desc', priceRangeKey: 'guide_furn_kitchen_price' },
+  ],
 };
 
 // Base category data (non-translatable)
@@ -112,6 +145,8 @@ const baseCategories = [
   { id: 'cleaning', nameKey: 'cat_cleaning', image: '/cleaning-service.jpg', icon: 'Sparkles', color: 'text-teal-700', bgColor: 'bg-teal-50', averagePrice: '$30-60', unitKey: 'unit_hour' },
   { id: 'plumbing', nameKey: 'cat_plumbing', image: '/plumbing-service.jpg', icon: 'Droplets', color: 'text-cyan-700', bgColor: 'bg-cyan-50', averagePrice: '$80-140', unitKey: 'unit_hour' },
   { id: 'electrical', nameKey: 'cat_electrical', image: '/electrical-service.jpg', icon: 'Zap', color: 'text-amber-600', bgColor: 'bg-amber-50', averagePrice: '$90-150', unitKey: 'unit_hour' },
+  { id: 'moving', nameKey: 'cat_moving', image: '/moving-service.jpg', icon: 'Truck', color: 'text-indigo-700', bgColor: 'bg-indigo-50', averagePrice: '$150-800', unitKey: 'unit_job' },
+  { id: 'furniture', nameKey: 'cat_furniture', image: '/furniture-service.jpg', icon: 'Sofa', color: 'text-rose-700', bgColor: 'bg-rose-50', averagePrice: '$50-150', unitKey: 'unit_item' },
 ];
 
 // Helper to translate fields using a t function
