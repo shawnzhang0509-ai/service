@@ -100,6 +100,15 @@ function sendSubmissionEmail(body, sheetUrl) {
   }
 }
 
+/** 第 0 步：若报 script.send_mail 无权限，先运行本函数并完成授权弹窗 */
+function authorizeEmail() {
+  MailApp.sendEmail({
+    to: NOTIFY_EMAIL,
+    subject: '[NZ Trade Hub] 授权测试',
+    body: '如果你收到这封邮件，说明发信权限已 OK。',
+  });
+}
+
 /** 在编辑器里运行：专门测试发邮件（会弹出授权） */
 function testEmail() {
   const result = sendSubmissionEmail(
