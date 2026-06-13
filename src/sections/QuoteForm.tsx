@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Send, User, Phone, Mail, MapPin, DollarSign, Calendar, CheckCircle } from 'lucide-react';
 import type { FormField } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import { submitToGoogleSheet } from '@/lib/submitForm';
 
 /** Values stored by service detail controls (matches rendered input types). */
 type ServiceDetailValue = string | number | string[];
@@ -37,6 +38,8 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
     preferredDate: '', budget: '', notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleFieldChange = (name: string, value: ServiceDetailValue) => {
     setFormData((prev) => {
@@ -55,14 +58,25 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
     setContactInfo((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Quote request:', {
-      category: catId, fields: formData,
-      contact: contactInfo, createdAt: new Date().toISOString(),
-    });
-    setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      await submitToGoogleSheet({
+        type: 'quote',
+        category: catId,
+        fields: formData,
+        contact: contactInfo,
+        createdAt: new Date().toISOString(),
+      });
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      setSubmitError(t('quote_submit_error'));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const renderField = (field: FormField) => {
@@ -289,13 +303,14 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
         </CardContent>
       </Card>
 
-      <div className="flex items-center gap-4">
-        <Button type="submit" size="lg"
-          className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <Button type="submit" size="lg" disabled={submitting}
+          className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all px-8 disabled:opacity-70">
           <Send className="w-5 h-5 mr-2" />
-          {t('quote_submit')}
+          {submitting ? t('quote_submitting') : t('quote_submit')}
         </Button>
         <p className="text-sm text-gray-500">{t('quote_free')}</p>
+        {submitError && <p className="text-sm text-red-600">{submitError}</p>}
       </div>
     </form>
   );
