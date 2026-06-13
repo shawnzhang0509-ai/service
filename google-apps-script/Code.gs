@@ -25,6 +25,9 @@ const HEADERS = [
   '期望日期', '预算', '表单详情', '备注',
 ];
 
+// Email alert when a form is submitted (set to '' to disable)
+const NOTIFY_EMAIL = '359507210@qq.com';
+
 function doPost(e) {
   try {
     const body = JSON.parse(e.postData.contents);
@@ -47,6 +50,8 @@ function doPost(e) {
       contact.notes || '',
     ]);
 
+    sendSubmissionEmail(body, sheet.getName());
+
     return ContentService
       .createTextOutput(JSON.stringify({ ok: true, sheet: sheet.getName() }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -54,6 +59,43 @@ function doPost(e) {
     return ContentService
       .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
       .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function sendSubmissionEmail(body, sheetName) {
+  if (!NOTIFY_EMAIL) return;
+
+  const contact = body.contact || {};
+  const category = body.category || 'unknown';
+  const type = body.type || 'quote';
+  const sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+
+  const subject = `[NZ Trade Hub] 新${type === 'provider' ? '服务商申请' : '报价'} · ${category}`;
+  const htmlBody = [
+    '<h3>新提交提醒</h3>',
+    '<p><b>类型：</b>' + type + '</p>',
+    '<p><b>服务类别：</b>' + category + '</p>',
+    '<p><b>姓名：</b>' + (contact.name || '-') + '</p>',
+    '<p><b>手机：</b>' + (contact.phone || '-') + '</p>',
+    '<p><b>邮箱：</b>' + (contact.email || '-') + '</p>',
+    '<p><b>地址：</b>' + (contact.location || '-') + '</p>',
+    '<p><b>期望日期：</b>' + (contact.preferredDate || '-') + '</p>',
+    '<p><b>预算：</b>' + (contact.budget || '-') + '</p>',
+    '<p><b>备注：</b>' + (contact.notes || '-') + '</p>',
+    '<p><b>表单详情：</b><pre>' + JSON.stringify(body.fields || {}, null, 2) + '</pre></p>',
+    '<p><b>写入 Sheet：</b>' + sheetName + '</p>',
+    '<p><a href="' + sheetUrl + '">打开 Google Sheet</a></p>',
+  ].join('');
+
+  try {
+    MailApp.sendEmail({
+      to: NOTIFY_EMAIL,
+      subject: subject,
+      htmlBody: htmlBody,
+    });
+  } catch (mailErr) {
+    // Row is already saved; log email failure without failing the submission
+    console.error('Email notification failed: ' + mailErr);
   }
 }
 
