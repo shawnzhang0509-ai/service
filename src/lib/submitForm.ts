@@ -8,7 +8,7 @@ export interface SheetFormPayload {
 
 const GOOGLE_SCRIPT_URL =
   import.meta.env.VITE_GOOGLE_SCRIPT_URL ??
-  'https://script.google.com/macros/s/AKfycbzKia3q76-Qnon-sbLkMCYtQt8I1aO_wi8neLQk4UQxp1esyGQf6vcGCEqxSmAdLyk/exec';
+  'https://script.google.com/macros/s/AKfycbzXruNkDkVrWT2b5vD_8ZssPpL0W-fmvtRVjr3AcJaev4oEhYxJ6_Zt-Lt2MQoBcuBc/exec';
 
 /** POST JSON to Google Apps Script web app (writes a row to the linked Sheet). */
 export async function submitToGoogleSheet(payload: SheetFormPayload): Promise<void> {
