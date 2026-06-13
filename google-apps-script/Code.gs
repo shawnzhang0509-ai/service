@@ -1,40 +1,31 @@
 /**
- * Paste into Extensions → Apps Script on your Google Sheet.
- * Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone
- *
- * Routing modes (set ROUTE_BY_TAB):
- *   false — all rows go to SHEET_NAME (filter by 服务类别 column)
- *   true  — each category goes to its own tab (see TAB_NAMES)
+ * NZ Trade Hub — Google Sheet 表单接收脚本
+ * 1. 全选复制到 Sheet → 扩展程序 → Apps Script
+ * 2. 保存 → 部署 → 新部署 → 网页应用 → 执行身份：我 → 谁可以访问：任何人
+ * 3. 编辑器里先运行 testEmail() 授权发信，再运行 testAppend() 测写入
  */
-const ROUTE_BY_TAB = true;
-const DEFAULT_SHEET = 'All Quotes';
-
-const TAB_NAMES = {
-  fence: 'Fence',
-  painting: 'Painting',
-  cleaning: 'Cleaning',
-  plumbing: 'Plumbing',
-  electrical: 'Electrical',
-  moving: 'Moving',
-  furniture: 'Furniture',
-  provider: 'Providers',
-};
+const SHEET_NAME = 'Sheet1';
+const NOTIFY_EMAIL = '359507210@qq.com'; // 留空 '' 则不发邮件
 
 const HEADERS = [
   '时间', '类型', '服务类别', '姓名', '手机', '邮箱', '地址',
   '期望日期', '预算', '表单详情', '备注',
 ];
 
-// Email alert when a form is submitted (set to '' to disable)
-const NOTIFY_EMAIL = '359507210@qq.com';
-
 function doPost(e) {
   try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      throw new Error('找不到工作表 "' + SHEET_NAME + '"，请改 SHEET_NAME 或新建该 tab');
+    }
+
     const body = JSON.parse(e.postData.contents);
-    const sheet = getTargetSheet(body);
     const contact = body.contact || {};
 
-    ensureHeaders(sheet);
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(HEADERS);
+    }
 
     sheet.appendRow([
       body.createdAt || new Date().toISOString(),
@@ -50,10 +41,14 @@ function doPost(e) {
       contact.notes || '',
     ]);
 
-    sendSubmissionEmail(body, sheet.getName());
+    const emailResult = sendSubmissionEmail(body, ss.getUrl());
 
     return ContentService
-      .createTextOutput(JSON.stringify({ ok: true, sheet: sheet.getName() }))
+      .createTextOutput(JSON.stringify({
+        ok: true,
+        emailSent: emailResult.sent,
+        emailError: emailResult.error,
+      }))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService
@@ -62,77 +57,78 @@ function doPost(e) {
   }
 }
 
-function sendSubmissionEmail(body, sheetName) {
-  if (!NOTIFY_EMAIL) return;
+function sendSubmissionEmail(body, sheetUrl) {
+  if (!NOTIFY_EMAIL) {
+    return { sent: false, error: 'NOTIFY_EMAIL 未设置' };
+  }
 
   const contact = body.contact || {};
   const category = body.category || 'unknown';
   const type = body.type || 'quote';
-  const sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  const subject = '[NZ Trade Hub] 新' + (type === 'provider' ? '服务商申请' : '报价') + ' · ' + category;
 
-  const subject = `[NZ Trade Hub] 新${type === 'provider' ? '服务商申请' : '报价'} · ${category}`;
-  const htmlBody = [
-    '<h3>新提交提醒</h3>',
-    '<p><b>类型：</b>' + type + '</p>',
-    '<p><b>服务类别：</b>' + category + '</p>',
-    '<p><b>姓名：</b>' + (contact.name || '-') + '</p>',
-    '<p><b>手机：</b>' + (contact.phone || '-') + '</p>',
-    '<p><b>邮箱：</b>' + (contact.email || '-') + '</p>',
-    '<p><b>地址：</b>' + (contact.location || '-') + '</p>',
-    '<p><b>期望日期：</b>' + (contact.preferredDate || '-') + '</p>',
-    '<p><b>预算：</b>' + (contact.budget || '-') + '</p>',
-    '<p><b>备注：</b>' + (contact.notes || '-') + '</p>',
-    '<p><b>表单详情：</b><pre>' + JSON.stringify(body.fields || {}, null, 2) + '</pre></p>',
-    '<p><b>写入 Sheet：</b>' + sheetName + '</p>',
-    '<p><a href="' + sheetUrl + '">打开 Google Sheet</a></p>',
-  ].join('');
+  const lines = [
+    '新提交提醒',
+    '类型: ' + type,
+    '服务类别: ' + category,
+    '姓名: ' + (contact.name || '-'),
+    '手机: ' + (contact.phone || '-'),
+    '邮箱: ' + (contact.email || '-'),
+    '地址: ' + (contact.location || '-'),
+    '期望日期: ' + (contact.preferredDate || '-'),
+    '预算: ' + (contact.budget || '-'),
+    '备注: ' + (contact.notes || '-'),
+    '表单详情: ' + JSON.stringify(body.fields || {}),
+    'Sheet: ' + sheetUrl,
+  ];
+  const plainBody = lines.join('\n');
 
   try {
-    MailApp.sendEmail({
+    const ownerEmail = Session.getEffectiveUser().getEmail();
+    const options = {
       to: NOTIFY_EMAIL,
       subject: subject,
-      htmlBody: htmlBody,
-    });
+      body: plainBody,
+    };
+    // 同时抄送一份到你的 Google 邮箱，方便确认脚本是否真的发出去了
+    if (ownerEmail) {
+      options.cc = ownerEmail;
+    }
+    MailApp.sendEmail(options);
+    return { sent: true, error: null };
   } catch (mailErr) {
-    // Row is already saved; log email failure without failing the submission
-    console.error('Email notification failed: ' + mailErr);
+    return { sent: false, error: String(mailErr) };
   }
 }
 
-function getTargetSheet(body) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  if (!ROUTE_BY_TAB) {
-    return getOrCreateSheet(ss, DEFAULT_SHEET);
-  }
-
-  const key = body.category || 'other';
-  const tabName = TAB_NAMES[key] || 'Other';
-  return getOrCreateSheet(ss, tabName);
+/** 在编辑器里运行：专门测试发邮件（会弹出授权） */
+function testEmail() {
+  const result = sendSubmissionEmail(
+    {
+      type: 'quote',
+      category: 'test',
+      fields: { note: 'testEmail() 邮件测试' },
+      contact: {
+        name: '邮件测试',
+        phone: '021000000',
+        location: 'Auckland',
+      },
+    },
+    SpreadsheetApp.getActiveSpreadsheet().getUrl()
+  );
+  Logger.log(result);
+  return result;
 }
 
-function getOrCreateSheet(ss, name) {
-  let sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-  }
-  return sheet;
-}
-
-function ensureHeaders(sheet) {
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(HEADERS);
-  }
-}
-
+/** 在编辑器里运行：测试写入 Sheet + 发邮件 */
 function testAppend() {
-  doPost({
+  const output = doPost({
     postData: {
       contents: JSON.stringify({
         type: 'quote',
         category: 'fence',
         createdAt: new Date().toISOString(),
-        fields: { fenceType: 'Wooden' },
+        fields: { fenceType: 'Wooden', serviceType: 'New Install' },
         contact: {
           name: 'Test',
           phone: '021000000',
@@ -142,4 +138,5 @@ function testAppend() {
       }),
     },
   });
+  Logger.log(output.getContent());
 }
