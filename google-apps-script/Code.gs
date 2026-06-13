@@ -6,6 +6,8 @@
  */
 const SHEET_NAME = 'Sheet1';
 const NOTIFY_EMAIL = '359507210@qq.com'; // 留空 '' 则不发邮件
+// 可选：再抄送一份到你的 Gmail（填 Google 邮箱；留空则不抄送）
+const NOTIFY_GMAIL_CC = '';
 
 const HEADERS = [
   '时间', '类型', '服务类别', '姓名', '手机', '邮箱', '地址',
@@ -67,7 +69,7 @@ function sendSubmissionEmail(body, sheetUrl) {
   const type = body.type || 'quote';
   const subject = '[NZ Trade Hub] 新' + (type === 'provider' ? '服务商申请' : '报价') + ' · ' + category;
 
-  const lines = [
+  const plainBody = [
     '新提交提醒',
     '类型: ' + type,
     '服务类别: ' + category,
@@ -80,19 +82,16 @@ function sendSubmissionEmail(body, sheetUrl) {
     '备注: ' + (contact.notes || '-'),
     '表单详情: ' + JSON.stringify(body.fields || {}),
     'Sheet: ' + sheetUrl,
-  ];
-  const plainBody = lines.join('\n');
+  ].join('\n');
 
   try {
-    const ownerEmail = Session.getEffectiveUser().getEmail();
     const options = {
       to: NOTIFY_EMAIL,
       subject: subject,
       body: plainBody,
     };
-    // 同时抄送一份到你的 Google 邮箱，方便确认脚本是否真的发出去了
-    if (ownerEmail) {
-      options.cc = ownerEmail;
+    if (NOTIFY_GMAIL_CC) {
+      options.cc = NOTIFY_GMAIL_CC;
     }
     MailApp.sendEmail(options);
     return { sent: true, error: null };
