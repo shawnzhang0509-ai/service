@@ -13,20 +13,22 @@ const rawFormFields: Record<string, Array<{
   max?: number;
   step?: number;
   visibleWhen?: FormField['visibleWhen'];
+  illustrationKey?: string;
+  illustrationCaptionKey?: string;
 }>> = {
   fence: [
-    { name: 'fenceType', labelKey: 'fl_fence_type', type: 'select', optionKeys: ['opt_wooden','opt_metal','opt_pvc','opt_concrete','opt_other'], required: true },
-    { name: 'serviceType', labelKey: 'fl_service_type', type: 'select', optionKeys: ['opt_new_install','opt_partial','opt_full','opt_heighten','opt_other'], required: true },
-    { name: 'totalLength', labelKey: 'fl_total_length', type: 'number', placeholderKey: 'ph_fence_length', required: true, helperKey: 'hlp_fence_length' },
-    { name: 'fenceHeight', labelKey: 'fl_fence_height', type: 'select', optionKeys: ['opt_0_9','opt_1_2','opt_1_5','opt_1_8','opt_2_0'], required: true },
+    { name: 'fenceType', labelKey: 'fl_fence_type', type: 'select', optionKeys: ['opt_wooden','opt_metal','opt_pvc','opt_concrete','opt_other'], required: true, illustrationKey: 'ill_fence_types', illustrationCaptionKey: 'ill_cap_fence_types' },
+    { name: 'serviceType', labelKey: 'fl_service_type', type: 'select', optionKeys: ['opt_new_install','opt_partial','opt_full','opt_heighten','opt_other'], required: true, illustrationKey: 'ill_fence_service', illustrationCaptionKey: 'ill_cap_fence_service' },
+    { name: 'totalLength', labelKey: 'fl_total_length', type: 'number', placeholderKey: 'ph_fence_length', required: true, helperKey: 'hlp_fence_length', illustrationKey: 'ill_fence_length', illustrationCaptionKey: 'ill_cap_fence_length' },
+    { name: 'fenceHeight', labelKey: 'fl_fence_height', type: 'select', optionKeys: ['opt_0_9','opt_1_2','opt_1_5','opt_1_8','opt_2_0'], required: true, illustrationKey: 'ill_fence_height', illustrationCaptionKey: 'ill_cap_fence_height' },
     { name: 'woodType', labelKey: 'fl_wood_pref', type: 'select', optionKeys: ['opt_pine','opt_treated','opt_hardwood','opt_redwood','opt_no_pref'], required: false, visibleWhen: { field: 'fenceType', anyOfOptionKeys: ['opt_wooden'] } },
     { name: 'damageLevel', labelKey: 'fl_damage', type: 'select', optionKeys: ['opt_minor','opt_moderate','opt_severe','opt_none'], required: true, visibleWhen: { field: 'serviceType', anyOfOptionKeys: ['opt_partial','opt_full','opt_heighten','opt_other'] } },
-    { name: 'includeGate', labelKey: 'fl_need_gate', type: 'checkbox', optionKeys: ['opt_single','opt_double','opt_sliding','opt_no_gate'], required: false },
+    { name: 'includeGate', labelKey: 'fl_need_gate', type: 'checkbox', optionKeys: ['opt_single','opt_double','opt_sliding','opt_no_gate'], required: false, illustrationKey: 'ill_fence_gate', illustrationCaptionKey: 'ill_cap_fence_gate' },
     { name: 'postType', labelKey: 'fl_post', type: 'radio', optionKeys: ['opt_wood_post','opt_metal_post','opt_concrete_post'], required: false },
   ],
   painting: [
-    { name: 'paintArea', labelKey: 'fl_paint_area', type: 'select', optionKeys: ['opt_interior','opt_exterior','opt_roof','opt_doors','opt_whole','opt_other'], required: true },
-    { name: 'areaSize', labelKey: 'fl_area_size', type: 'number', placeholderKey: 'ph_area', required: true, helperKey: 'hlp_paint_area' },
+    { name: 'paintArea', labelKey: 'fl_paint_area', type: 'select', optionKeys: ['opt_interior','opt_exterior','opt_roof','opt_doors','opt_whole','opt_other'], required: true, illustrationKey: 'ill_paint_area', illustrationCaptionKey: 'ill_cap_paint_area' },
+    { name: 'areaSize', labelKey: 'fl_area_size', type: 'number', placeholderKey: 'ph_area', required: true, helperKey: 'hlp_paint_area', illustrationKey: 'ill_paint_measure', illustrationCaptionKey: 'ill_cap_paint_measure' },
     { name: 'roomCount', labelKey: 'fl_room_count', type: 'number', placeholderKey: 'ph_rooms', required: false },
     { name: 'surfaceCondition', labelKey: 'fl_surface', type: 'select', optionKeys: ['opt_new_surface','opt_good','opt_fair','opt_poor'], required: true },
     { name: 'paintType', labelKey: 'fl_paint_type', type: 'select', optionKeys: ['opt_latex','opt_oil','opt_eco','opt_mould','opt_not_sure'], required: true },
@@ -38,7 +40,7 @@ const rawFormFields: Record<string, Array<{
   cleaning: [
     { name: 'propertyType', labelKey: 'fl_prop_type', type: 'select', optionKeys: ['opt_apartment','opt_house','opt_townhouse','opt_commercial','opt_other'], required: true },
     { name: 'areaSize', labelKey: 'fl_area_size', type: 'number', placeholderKey: 'ph_area', required: true },
-    { name: 'bedroomCount', labelKey: 'fl_bedrooms', type: 'select', optionKeys: ['opt_1','opt_2','opt_3','opt_4','opt_5plus'], required: true },
+    { name: 'bedroomCount', labelKey: 'fl_bedrooms', type: 'select', optionKeys: ['opt_1','opt_2','opt_3','opt_4','opt_5plus'], required: true, illustrationKey: 'ill_clean_rooms', illustrationCaptionKey: 'ill_cap_clean_rooms' },
     { name: 'bathroomCount', labelKey: 'fl_bathrooms', type: 'select', optionKeys: ['opt_1','opt_1_5bath','opt_2','opt_2_5bath','opt_3plus_bath'], required: true },
     { name: 'cleaningType', labelKey: 'fl_cleaning_type', type: 'select', optionKeys: ['opt_regular','opt_deep','opt_move_in','opt_move_out','opt_post_reno','opt_other'], required: true },
     { name: 'frequency', labelKey: 'fl_frequency', type: 'select', optionKeys: ['opt_one_off','opt_weekly','opt_fortnightly','opt_monthly','opt_as_needed'], required: true },
@@ -49,7 +51,7 @@ const rawFormFields: Record<string, Array<{
     { name: 'issueType', labelKey: 'fl_issue', type: 'select', optionKeys: ['opt_leak','opt_blocked','opt_tap','opt_toilet','opt_hot_water','opt_pipe','opt_kitchen_plumb','opt_other'], required: true },
     { name: 'urgency', labelKey: 'fl_urgency', type: 'select', optionKeys: ['opt_immediate','opt_24h','opt_this_week','opt_flexible'], required: true },
     { name: 'propertyType', labelKey: 'fl_prop_type', type: 'select', optionKeys: ['opt_house','opt_apartment','opt_townhouse','opt_commercial','opt_other'], required: true },
-    { name: 'locationDetails', labelKey: 'fl_prob_loc', type: 'select', optionKeys: ['opt_kitchen','opt_bath_main','opt_bath_guest','opt_laundry','opt_garden','opt_basement','opt_multiple'], required: true },
+    { name: 'locationDetails', labelKey: 'fl_prob_loc', type: 'select', optionKeys: ['opt_kitchen','opt_bath_main','opt_bath_guest','opt_laundry','opt_garden','opt_basement','opt_multiple'], required: true, illustrationKey: 'ill_plumb_location', illustrationCaptionKey: 'ill_cap_plumb_location' },
     { name: 'description', labelKey: 'fl_prob_desc', type: 'textarea', placeholderKey: 'ph_desc_plumb', required: true, helperKey: 'hlp_plumb_desc' },
     { name: 'hasPhotos', labelKey: 'fl_photos', type: 'radio', optionKeys: ['opt_photo_yes','opt_photo_no'], required: false },
     { name: 'accessTime', labelKey: 'fl_avail', type: 'select', optionKeys: ['opt_weekday','opt_evening','opt_weekend','opt_anytime'], required: true },
@@ -60,14 +62,14 @@ const rawFormFields: Record<string, Array<{
     { name: 'propertyType', labelKey: 'fl_prop_type', type: 'select', optionKeys: ['opt_house','opt_apartment','opt_townhouse','opt_commercial','opt_other'], required: true },
     { name: 'circuitCondition', labelKey: 'fl_circuit', type: 'select', optionKeys: ['opt_unknown','opt_old','opt_medium','opt_modern','opt_new_build'], required: false },
     { name: 'description', labelKey: 'fl_proj_desc', type: 'textarea', placeholderKey: 'ph_desc_elec', required: true },
-    { name: 'itemCount', labelKey: 'fl_quantity', type: 'number', placeholderKey: 'ph_items', required: false },
+    { name: 'itemCount', labelKey: 'fl_quantity', type: 'number', placeholderKey: 'ph_items', required: false, illustrationKey: 'ill_elec_items', illustrationCaptionKey: 'ill_cap_elec_items' },
     { name: 'needCertification', labelKey: 'fl_cert', type: 'radio', optionKeys: ['opt_need_coc','opt_no'], required: false, helperKey: 'hlp_cert' },
     { name: 'accessTime', labelKey: 'fl_avail', type: 'select', optionKeys: ['opt_weekday','opt_evening','opt_weekend','opt_anytime'], required: true },
   ],
   moving: [
     { name: 'moveType', labelKey: 'fl_move_type', type: 'select', optionKeys: ['opt_move_local','opt_move_intercity','opt_move_office','opt_move_few','opt_other'], required: true },
-    { name: 'loadSize', labelKey: 'fl_load_size', type: 'select', optionKeys: ['opt_studio','opt_1br','opt_2br','opt_3br','opt_4br_plus'], required: true },
-    { name: 'fromAddress', labelKey: 'fl_from_address', type: 'text', placeholderKey: 'ph_from_address', required: true },
+    { name: 'loadSize', labelKey: 'fl_load_size', type: 'select', optionKeys: ['opt_studio','opt_1br','opt_2br','opt_3br','opt_4br_plus'], required: true, illustrationKey: 'ill_move_load', illustrationCaptionKey: 'ill_cap_move_load' },
+    { name: 'fromAddress', labelKey: 'fl_from_address', type: 'text', placeholderKey: 'ph_from_address', required: true, illustrationKey: 'ill_move_route', illustrationCaptionKey: 'ill_cap_move_route' },
     { name: 'toAddress', labelKey: 'fl_to_address', type: 'text', placeholderKey: 'ph_to_address', required: true },
     { name: 'moveDate', labelKey: 'fl_move_date', type: 'date', required: true },
     { name: 'needPacking', labelKey: 'fl_need_packing', type: 'radio', optionKeys: ['opt_packing_full','opt_packing_partial','opt_packing_none'], required: true },
@@ -75,8 +77,8 @@ const rawFormFields: Record<string, Array<{
     { name: 'accessNotes', labelKey: 'fl_move_access', type: 'textarea', placeholderKey: 'ph_move_access', required: false, helperKey: 'hlp_move_access' },
   ],
   furniture: [
-    { name: 'furnitureType', labelKey: 'fl_furniture_type', type: 'select', optionKeys: ['opt_furn_ikea','opt_furn_flat','opt_furn_office','opt_furn_outdoor','opt_furn_kitchen','opt_other'], required: true },
-    { name: 'itemCount', labelKey: 'fl_quantity', type: 'number', placeholderKey: 'ph_furniture_items', required: true },
+    { name: 'furnitureType', labelKey: 'fl_furniture_type', type: 'select', optionKeys: ['opt_furn_ikea','opt_furn_flat','opt_furn_office','opt_furn_outdoor','opt_furn_kitchen','opt_other'], required: true, illustrationKey: 'ill_furn_assembly', illustrationCaptionKey: 'ill_cap_furn_assembly' },
+    { name: 'itemCount', labelKey: 'fl_quantity', type: 'number', placeholderKey: 'ph_furniture_items', required: true, illustrationKey: 'ill_furn_assembly', illustrationCaptionKey: 'ill_cap_furn_count' },
     { name: 'roomLocation', labelKey: 'fl_furn_room', type: 'select', optionKeys: ['opt_living','opt_bedroom','opt_office_room','opt_outdoor','opt_whole_house'], required: true },
     { name: 'hasManual', labelKey: 'fl_has_manual', type: 'radio', optionKeys: ['opt_yes','opt_no','opt_unsure'], required: true },
     { name: 'needRemoval', labelKey: 'fl_need_removal', type: 'radio', optionKeys: ['opt_yes','opt_no'], required: false },
@@ -165,6 +167,8 @@ export function getTranslatedFields(catId: string, t: (key: string) => string): 
     max: f.max,
     step: f.step,
     visibleWhen: f.visibleWhen,
+    illustrationKey: f.illustrationKey,
+    illustrationCaption: f.illustrationCaptionKey ? t(f.illustrationCaptionKey) : undefined,
   }));
 }
 

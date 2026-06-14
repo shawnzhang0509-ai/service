@@ -13,6 +13,7 @@ import { Send, User, Phone, Mail, MapPin, DollarSign, Calendar, CheckCircle } fr
 import type { FormField } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { submitToGoogleSheet } from '@/lib/submitForm';
+import FieldIllustration from '@/components/quote/FieldIllustration';
 
 /** Values stored by service detail controls (matches rendered input types). */
 type ServiceDetailValue = string | number | string[];
@@ -220,6 +221,7 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
                 {field.label}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
+              <FieldIllustration field={field} formData={formData} translate={t} />
               {renderField(field)}
               {field.helperText && <p className="text-xs text-gray-400 mt-1.5">{field.helperText}</p>}
             </div>
