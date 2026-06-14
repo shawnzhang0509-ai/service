@@ -26,6 +26,9 @@ export interface FormField {
   step?: number;
   /** Show this field only when the named field's value equals one of these option labels (via translation keys). */
   visibleWhen?: { field: string; anyOfOptionKeys: string[] };
+  /** SVG schematic shown above the control (see FieldIllustration). */
+  illustrationKey?: string;
+  illustrationCaption?: string;
 }
 
 export interface QuoteGuidance {
