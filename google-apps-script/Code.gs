@@ -8,6 +8,7 @@ const SHEET_NAME = 'Sheet1';
 const NOTIFY_EMAIL = '359507210@qq.com'; // 留空 '' 则不发邮件
 const NOTIFY_GMAIL_CC = '';
 const UPLOAD_FOLDER_NAME = 'NZ Trade Hub Uploads';
+const CHUNK_PREFIX = '_chunk_';
 
 const HEADERS = [
   '时间', '类型', '服务类别', '姓名', '手机', '邮箱', '地址',
@@ -16,13 +17,18 @@ const HEADERS = [
 
 function doPost(e) {
   try {
+    const body = JSON.parse(e.postData.contents);
+
+    if (body.action === 'videoChunk') {
+      return handleVideoChunk(body);
+    }
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) {
       throw new Error('找不到工作表 "' + SHEET_NAME + '"，请改 SHEET_NAME 或新建该 tab');
     }
 
-    const body = JSON.parse(e.postData.contents);
     const contact = body.contact || {};
     const photoUrl = saveSitePhoto(body);
 
@@ -60,6 +66,62 @@ function doPost(e) {
   }
 }
 
+function handleVideoChunk(body) {
+  const uploadId = body.uploadId;
+  const chunkIndex = body.chunkIndex;
+  const totalChunks = body.totalChunks;
+  const folder = getUploadFolder();
+  const chunkName = uploadId + CHUNK_PREFIX + chunkIndex;
+
+  const bytes = Utilities.base64Decode(body.data);
+  const chunkBlob = Utilities.newBlob(bytes, 'application/octet-stream', chunkName);
+  const existing = folder.getFilesByName(chunkName);
+  while (existing.hasNext()) {
+    existing.next().setTrashed(true);
+  }
+  folder.createFile(chunkBlob);
+
+  if (!body.isLast) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const blobs = [];
+  for (var i = 0; i < totalChunks; i++) {
+    var name = uploadId + CHUNK_PREFIX + i;
+    var files = folder.getFilesByName(name);
+    if (!files.hasNext()) {
+      throw new Error('Missing chunk ' + i + ' for upload ' + uploadId);
+    }
+    blobs.push(files.next().getBlob());
+  }
+
+  var allBytes = [];
+  for (var j = 0; j < blobs.length; j++) {
+    var chunkBytes = blobs[j].getBytes();
+    for (var k = 0; k < chunkBytes.length; k++) {
+      allBytes.push(chunkBytes[k]);
+    }
+  }
+
+  var fileName = body.fileName || (uploadId + '.mp4');
+  var finalBlob = Utilities.newBlob(allBytes, body.mimeType || 'video/mp4', fileName);
+  var file = folder.createFile(finalBlob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  for (var m = 0; m < totalChunks; m++) {
+    var cleanup = folder.getFilesByName(uploadId + CHUNK_PREFIX + m);
+    while (cleanup.hasNext()) {
+      cleanup.next().setTrashed(true);
+    }
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true, url: file.getUrl() }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 function ensureHeaders(sheet) {
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(HEADERS);
@@ -81,14 +143,25 @@ function getUploadFolder() {
 
 function saveSitePhoto(body) {
   const photo = body.sitePhoto;
-  if (!photo || !photo.base64) {
+  if (!photo) {
+    return '';
+  }
+
+  if (photo.url) {
+    return photo.url;
+  }
+
+  if (!photo.base64) {
     return '';
   }
 
   const category = body.category || 'quote';
   const contact = body.contact || {};
   const namePart = (contact.name || 'customer').replace(/[^\w\u4e00-\u9fff-]+/g, '_').slice(0, 30);
-  const fileName = photo.fileName || (category + '-' + namePart + '.jpg');
+  const ext = (photo.mimeType || '').indexOf('video/') === 0
+    ? (photo.fileName || '').split('.').pop() || 'mp4'
+    : 'jpg';
+  const fileName = photo.fileName || (category + '-' + namePart + '.' + ext);
 
   const bytes = Utilities.base64Decode(photo.base64);
   const blob = Utilities.newBlob(bytes, photo.mimeType || 'image/jpeg', fileName);
@@ -119,7 +192,7 @@ function sendSubmissionEmail(body, sheetUrl, photoUrl) {
     '预算: ' + (contact.budget || '-'),
     '备注: ' + (contact.notes || '-'),
     '表单详情: ' + JSON.stringify(body.fields || {}),
-    '现场示意图: ' + (photoUrl || '（未上传）'),
+    '现场示意图/视频: ' + (photoUrl || '（未上传）'),
     'Sheet: ' + sheetUrl,
   ].join('\n');
 

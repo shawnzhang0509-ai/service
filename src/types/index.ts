@@ -29,12 +29,20 @@ export interface FormField {
 }
 
 export interface SitePhotoPayload {
-  base64: string;
+  mediaKind: 'image' | 'video';
   mimeType: string;
   fileName: string;
   /** Client-only blob URL for preview; not sent to the server. */
   previewUrl: string;
+  /** Present for images after compression. */
+  base64?: string;
+  /** Present for videos — uploaded in chunks on form submit. */
+  file?: File;
 }
+
+export type SitePhotoSubmitPayload =
+  | { base64: string; mimeType: string; fileName: string }
+  | { url: string; mimeType: string; fileName: string };
 
 export interface QuoteGuidance {
   title: string;

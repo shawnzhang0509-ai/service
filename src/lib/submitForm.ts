@@ -1,4 +1,4 @@
-import type { SitePhotoPayload } from '@/types';
+import type { SitePhotoSubmitPayload } from '@/types';
 
 export interface SheetFormPayload {
   type: 'quote' | 'provider';
@@ -6,8 +6,8 @@ export interface SheetFormPayload {
   createdAt: string;
   fields?: Record<string, unknown>;
   contact?: Record<string, string>;
-  /** Annotated site photo (base64 JPEG, saved to Drive by Apps Script). */
-  sitePhoto?: Pick<SitePhotoPayload, 'base64' | 'mimeType' | 'fileName'>;
+  /** Annotated site photo or video (image base64 or pre-uploaded video URL). */
+  sitePhoto?: SitePhotoSubmitPayload;
 }
 
 const GOOGLE_SCRIPT_URL =
