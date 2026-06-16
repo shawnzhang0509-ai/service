@@ -9,11 +9,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Send, User, Phone, Mail, MapPin, DollarSign, Calendar, CheckCircle } from 'lucide-react';
-import type { FormField } from '@/types';
+import { Send, User, Phone, Mail, MapPin, DollarSign, Calendar, CheckCircle, ImageIcon } from 'lucide-react';
+import type { FormField, SitePhotoPayload } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { submitToGoogleSheet } from '@/lib/submitForm';
-import FieldIllustration from '@/components/quote/FieldIllustration';
+import SitePhotoUpload from '@/components/quote/SitePhotoUpload';
 
 /** Values stored by service detail controls (matches rendered input types). */
 type ServiceDetailValue = string | number | string[];
@@ -41,6 +41,7 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [sitePhoto, setSitePhoto] = useState<SitePhotoPayload | null>(null);
 
   const handleFieldChange = (name: string, value: ServiceDetailValue) => {
     setFormData((prev) => {
@@ -70,6 +71,9 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
         fields: formData,
         contact: contactInfo,
         createdAt: new Date().toISOString(),
+        sitePhoto: sitePhoto
+          ? { base64: sitePhoto.base64, mimeType: sitePhoto.mimeType, fileName: sitePhoto.fileName }
+          : undefined,
       });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -193,6 +197,7 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
           </div>
           <Button onClick={() => {
             setSubmitted(false); setFormData({});
+            setSitePhoto(null);
             setContactInfo({ name: '', phone: '', email: '', location: '', preferredDate: '', budget: '', notes: '' });
           }} className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white">
             {t('quote_another')}
@@ -221,7 +226,6 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
                 {field.label}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
-              <FieldIllustration field={field} formData={formData} translate={t} />
               {renderField(field)}
               {field.helperText && <p className="text-xs text-gray-400 mt-1.5">{field.helperText}</p>}
             </div>
@@ -302,6 +306,23 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
               value={contactInfo.notes}
               onChange={(e) => handleContactChange('notes', e.target.value)} className="min-h-[80px]" />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-gray-100 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-teal-600" />
+            {t('quote_site_photo_card')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SitePhotoUpload
+            categoryId={catId}
+            value={sitePhoto}
+            onChange={setSitePhoto}
+            translate={t}
+          />
         </CardContent>
       </Card>
 

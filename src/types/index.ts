@@ -26,9 +26,14 @@ export interface FormField {
   step?: number;
   /** Show this field only when the named field's value equals one of these option labels (via translation keys). */
   visibleWhen?: { field: string; anyOfOptionKeys: string[] };
-  /** SVG schematic shown above the control (see FieldIllustration). */
-  illustrationKey?: string;
-  illustrationCaption?: string;
+}
+
+export interface SitePhotoPayload {
+  base64: string;
+  mimeType: string;
+  fileName: string;
+  /** Client-only blob URL for preview; not sent to the server. */
+  previewUrl: string;
 }
 
 export interface QuoteGuidance {
