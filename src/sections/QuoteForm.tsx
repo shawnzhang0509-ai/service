@@ -13,6 +13,7 @@ import { Send, User, Phone, Mail, MapPin, DollarSign, Calendar, CheckCircle, Ima
 import type { FormField, SitePhotoPayload } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { submitToGoogleSheet } from '@/lib/submitForm';
+import { uploadVideoInChunks } from '@/lib/uploadVideo';
 import SitePhotoUpload from '@/components/quote/SitePhotoUpload';
 
 /** Values stored by service detail controls (matches rendered input types). */
@@ -41,6 +42,7 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [sitePhoto, setSitePhoto] = useState<SitePhotoPayload | null>(null);
 
   const handleFieldChange = (name: string, value: ServiceDetailValue) => {
@@ -65,20 +67,35 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
     setSubmitError(null);
     setSubmitting(true);
     try {
+      let sitePhotoPayload;
+      if (sitePhoto) {
+        if (sitePhoto.mediaKind === 'video' && sitePhoto.file) {
+          setUploadProgress(0);
+          const url = await uploadVideoInChunks(sitePhoto.file, setUploadProgress);
+          sitePhotoPayload = { url, mimeType: sitePhoto.mimeType, fileName: sitePhoto.fileName };
+          setUploadProgress(null);
+        } else if (sitePhoto.base64) {
+          sitePhotoPayload = {
+            base64: sitePhoto.base64,
+            mimeType: sitePhoto.mimeType,
+            fileName: sitePhoto.fileName,
+          };
+        }
+      }
+
       await submitToGoogleSheet({
         type: 'quote',
         category: catId,
         fields: formData,
         contact: contactInfo,
         createdAt: new Date().toISOString(),
-        sitePhoto: sitePhoto
-          ? { base64: sitePhoto.base64, mimeType: sitePhoto.mimeType, fileName: sitePhoto.fileName }
-          : undefined,
+        sitePhoto: sitePhotoPayload,
       });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setSubmitError(t('quote_submit_error'));
+      setUploadProgress(null);
     } finally {
       setSubmitting(false);
     }
@@ -330,7 +347,11 @@ export default function QuoteForm({ catId, formFields }: QuoteFormProps) {
         <Button type="submit" size="lg" disabled={submitting}
           className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all px-8 disabled:opacity-70">
           <Send className="w-5 h-5 mr-2" />
-          {submitting ? t('quote_submitting') : t('quote_submit')}
+          {uploadProgress !== null
+            ? `${t('quote_site_photo_uploading_video')} ${uploadProgress}%`
+            : submitting
+              ? t('quote_submitting')
+              : t('quote_submit')}
         </Button>
         <p className="text-sm text-gray-500">{t('quote_free')}</p>
         {submitError && <p className="text-sm text-red-600">{submitError}</p>}
