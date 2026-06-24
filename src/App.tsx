@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router'
+import { Analytics } from '@vercel/analytics/react'
 import Home from './pages/Home'
 import QuotePage from './pages/QuotePage'
 import ProviderPage from './pages/ProviderPage'
@@ -17,6 +18,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <Analytics />
     </div>
   )
 }
