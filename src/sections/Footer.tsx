@@ -23,8 +23,8 @@ export default function Footer() {
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">{t('footer_tagline')}</p>
             <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2 text-gray-400"><Mail className="w-4 h-4" /><span>contact@nztradehub.co.nz</span></div>
-              <div className="flex items-center gap-2 text-gray-400"><Phone className="w-4 h-4" /><span>0800 NZTRADE</span></div>
+              <div className="flex items-center gap-2 text-gray-400"><Mail className="w-4 h-4" /><span>nztradehub2026@gmail.com</span></div>
+              <div className="flex items-center gap-2 text-gray-400"><Phone className="w-4 h-4" /><span>02885146884</span></div>
               <div className="flex items-center gap-2 text-gray-400"><MapPin className="w-4 h-4" /><span>Auckland, New Zealand</span></div>
             </div>
           </div>
