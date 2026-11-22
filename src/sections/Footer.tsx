@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Wrench, Mail, Phone, MapPin } from 'lucide-react';
+import { Wrench, Mail, MapPin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useLanguage } from '@/context/LanguageContext';
 import { baseCategories } from '@/data/services';
@@ -24,7 +24,6 @@ export default function Footer() {
             <p className="text-sm text-gray-400 leading-relaxed mb-4">{t('footer_tagline')}</p>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 text-gray-400"><Mail className="w-4 h-4" /><span>nztradehub2026@gmail.com</span></div>
-              <div className="flex items-center gap-2 text-gray-400"><Phone className="w-4 h-4" /><span>02885146884</span></div>
               <div className="flex items-center gap-2 text-gray-400"><MapPin className="w-4 h-4" /><span>Auckland, New Zealand</span></div>
             </div>
           </div>
